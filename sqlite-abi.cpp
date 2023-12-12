@@ -1,5 +1,6 @@
 #include "sqlite-abi.h"
 #include "json.hpp"
+#include <string>
 
 sqlite3* sqlite3_abi_init(const char* path) {
     sqlite3* db;
@@ -23,12 +24,24 @@ const char* sqlite3_abi_exec(sqlite3* db, const char* sql) {
     }, nullptr, nullptr);
 
     if (state != SQLITE_OK) {
-        return "";
+        nlohmann::json errorJson = {
+            {"code", SQLITE_ERROR},
+            {"message", "Error executing query: " + std::string(sqlite3_errmsg(db))},
+            {"list", nlohmann::json::array()}
+        };
+        const auto errorStr = errorJson.dump();
+        const auto resultStr = new char[errorStr.size() + 1];
+        std::strcpy(resultStr, errorStr.c_str());
+        return resultStr;
     }
 
-    // 将查询结果的 JSON 字符串复制到分配的内存中
-    const auto jsonString = resultArray.dump();
-    const auto resultCStr = static_cast<char *>(malloc(jsonString.size() + 1));
-    strcpy(resultCStr, jsonString.c_str());
-    return resultCStr;
+    nlohmann::json successJson = {
+        {"code", SQLITE_OK},
+        {"message", "Query executed successfully"},
+        {"list", resultArray}
+    };
+    const std::string successStr = successJson.dump();
+    const auto resultStr = new char[successStr.size() + 1];
+    std::strcpy(resultStr, successStr.c_str());
+    return resultStr;
 }
