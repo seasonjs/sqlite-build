@@ -16,7 +16,7 @@ const char *sqlite3_abi_exec(sqlite3 *db, const char *sql) {
     auto state = sqlite3_exec(db, sql, [](void *data, int argc, char **argv, char **colName) -> int {
         auto row = nlohmann::json::object();
         for (int i = 0; i < argc; i++) {
-            row[colName[i]] = argv[i] ? argv[i] : "NULL";
+            row[colName[i]] = argv[i] ? argv[i] : "";
         }
         auto result = static_cast<nlohmann::json *>(data);
         result->push_back(row);
@@ -29,6 +29,7 @@ const char *sqlite3_abi_exec(sqlite3 *db, const char *sql) {
     const std::string successStr = resultArray.dump();
     const auto resultStr = new char[successStr.size() + 1];
     std::memcpy(resultStr, successStr.c_str(), successStr.size());
+    resultStr[successStr.size()] = '\x00';
     return resultStr;
 }
 
