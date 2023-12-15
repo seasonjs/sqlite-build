@@ -32,9 +32,18 @@ set_target_properties(sqlite PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(${SQLITE_ABI} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(${SQLITE_ABI} PUBLIC sqlite ${CMAKE_THREAD_LIBS_INIT})
 
-add_definitions(-DSQLITE_ENABLE_RTREE)
-add_definitions(-DSQLITE_ENABLE_FTS4)
-add_definitions(-DSQLITE_ENABLE_FTS5)
-add_definitions(-DSQLITE_ENABLE_JSON1)
-add_definitions(-DSQLITE_ENABLE_RBU)
-add_definitions(-DSQLITE_ENABLE_STAT4)
+target_compile_definitions(
+        sqlite PUBLIC
+        SQLITE_ENABLE_RTREE
+        SQLITE_ENABLE_FTS4
+        SQLITE_ENABLE_FTS5
+        SQLITE_ENABLE_JSON1
+        SQLITE_ENABLE_RBU
+        SQLITE_ENABLE_STAT4
+)
+
+if (WIN32 AND NOT MINGW32)
+    target_compile_definitions(sqlite PUBLIC SQLITE_API=__declspec\(dllexport\))
+else ()
+    target_compile_definitions(sqlite PUBLIC SQLITE_API=__attribute__\(\(visibility\(\"default\"\)\)\))
+endif ()

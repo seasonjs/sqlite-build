@@ -33,14 +33,11 @@ const char *sqlite3_abi_exec(sqlite3 *db, const char *sql) {
     return resultStr;
 }
 
-int sqlite3_abi_close(sqlite3 *db) {
-    return sqlite3_close(db);
-}
-
-const char *sqlite3_abi_errmsg(sqlite3 *db) {
-    return sqlite3_errmsg(db);
-}
-
-int sqlite3_abi_errcode(sqlite3 *db) {
-    return sqlite3_errcode(db);
+sqlite3_stmt *sqlite3_abi_prepare(sqlite3 *db, const char *zSql, int nByte) {
+    sqlite3_stmt *stmt;
+    auto state = sqlite3_prepare_v2(db, zSql, nByte, &stmt, nullptr);
+    if (state != SQLITE_OK) {
+        return nullptr;
+    }
+    return stmt;
 }

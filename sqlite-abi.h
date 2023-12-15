@@ -25,11 +25,7 @@ SQLITE_ABI_API sqlite3 *sqlite3_abi_init(const char *path);
 
 SQLITE_ABI_API const char *sqlite3_abi_exec(sqlite3 *db, const char *sql);
 
-SQLITE_ABI_API int sqlite3_abi_close(sqlite3 *db);
-
-SQLITE_ABI_API const char *sqlite3_abi_errmsg(sqlite3 *db);
-
-SQLITE_ABI_API int sqlite3_abi_errcode(sqlite3 *db);
+SQLITE_ABI_API sqlite3_stmt * sqlite3_abi_prepare(sqlite3 *db, const char *zSql, int nByte);
 
 #ifdef __cplusplus
 }
